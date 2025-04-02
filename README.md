@@ -12,11 +12,11 @@ Contains source code for plug-in Gaussian process used in the paper.
 - `GP_Matern_Hetero.R`, `GP_SE_Hetero.R`, `GP_Sobolev_Hetero.R`: GP with heterogeneous error used for real data application Figure 2(b).
 
 ### simulation/ (Section 4 of the paper)
-#### code/
-- `Figure1.R`: Produces plots shown in Figure 1.
-- `Table1.R`: Generates results in Table 1.
+- #### code/
+  - `Figure1.R`: Produces plots shown in Figure 1.
+  - `Table1.R`: Generates results in Table 1.
 
-#### result/
+- #### result/
 Simulation outputs used to generate Table 1.
 
 #### figure/
