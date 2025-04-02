@@ -17,19 +17,19 @@ Contains source code for plug-in Gaussian process used in the paper.
   - `Table1.R`: Generates results in Table 1.
 
 - #### result/
-Simulation outputs used to generate Table 1.
+  - Simulation outputs used to generate Table 1.
 
-#### figure/
-Plots in Figure 1.
+- #### figure/
+  - Plots in Figure 1.
 
 ### real_data/ (Section 5 of the paper)
-#### code/
-- `Figure2a.R`: Code for generating Figure 2(a).
-- `Figure2b.R`: Code for generating Figure 2(b).
+- #### code/
+  - `Figure2a.R`: Code for generating Figure 2(a).
+  - `Figure2b.R`: Code for generating Figure 2(b).
 
-#### data/
-- `CSIRO_Recons_gmsl_yr_2015.txt`: Global mean sea level data.
+- #### data/
+  - `CSIRO_Recons_gmsl_yr_2015.txt`: Global mean sea level data.
 
-#### figure/
-- `GMSL-1.pdf`: Corresponds to Figure 2(a).
-- `GMSL-2.pdf`: Corresponds to Figure 2(b).
+- #### figure/
+  - `GMSL-1.pdf`: Corresponds to Figure 2(a).
+  - `GMSL-2.pdf`: Corresponds to Figure 2(b).
