@@ -8,8 +8,8 @@ Inference on function derivatives using Plug-in Gaussian processes
   - `GP_Matern.R`: Plug-in GP with Matérn kernel.
   - `GP_SE.R`: Plug-in GP with squared-exponential kernel.
   - `GP_Sobolev.R`: Plug-in GP with Sobolev kernel.
-  - `GP_Bspline.R`: GP with B-spline prior in Yoo and Ghosal (2016).
   - `GP_Matern_Hetero.R`, `GP_SE_Hetero.R`, `GP_Sobolev_Hetero.R`: GP with heterogeneous error used for real data application Figure 2(b).
+  - `GP_Bspline.R`: GP with B-spline prior in Yoo and Ghosal (2016) as a benchmark; the code was provided by the original author of the paper.
 
 ### simulation/ (Section 4 of the paper)
 - #### code/
