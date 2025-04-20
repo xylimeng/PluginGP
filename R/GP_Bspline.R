@@ -3,7 +3,7 @@ library(splines)
 #calculate sigma2hat for empirical Bayes
 sigma2emp <- function(y, cmiddle, B, eta){
   ydiff <- y - B %*% eta
-  sigma2 = (crossprod(ydiff) - crossprod(forwardsolve(cmiddle, crossprod(B, ydiff)))) / n  #(3.7) 重要公式
+  sigma2 = (crossprod(ydiff) - crossprod(forwardsolve(cmiddle, crossprod(B, ydiff)))) / n
   return(sigma2)
 }
 
@@ -97,7 +97,7 @@ get_Bspline <- function(x, y, x_new, alpha = 0.05, CI = FALSE){
   
   a = seq(from = 0, to = 1, length.out = N + 2)[-c(1, N + 2)]  #intex of knots from 0 to N+1
   
-  B <- bs(x, knots = a, degree = degree, intercept = TRUE, Boundary.knots = c(0,1))  #J control points
+  B <- bs(x, knots = a, degree = degree, intercept = TRUE, Boundary.knots = c(0,1))
   BB <- crossprod(B)
   V = BB + Omegainv
   cmiddle <- t(chol(V))
