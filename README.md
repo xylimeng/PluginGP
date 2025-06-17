@@ -33,3 +33,22 @@ Inference on function derivatives using Plug-in Gaussian processes
 - #### figure/
   - `GMSL-1.pdf`: Corresponds to Figure 2(a).
   - `GMSL-2.pdf`: Corresponds to Figure 2(b).
+
+## Dependencies
+
+The following R packages are required to run the code:
+
+- `splines`
+- `MASS`
+- `Rsolnp`
+- `RandomFieldsUtils`
+- `foreach`
+- `doSNOW`
+- `doParallel`
+
+The code depends on the `RandomFieldsUtils` package for computing the Matérn kernel. Since this package has been removed from CRAN, it must be installed manually from GitHub:
+
+```r
+install.packages("remotes")  # if not already installed
+remotes::install_github("cran/RandomFieldsUtils")
+```
