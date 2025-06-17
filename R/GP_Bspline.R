@@ -1,3 +1,26 @@
+# Implements the B-spline method proposed by Yoo and Ghosal (2016), 
+# which serves as a benchmark method in the associated paper.
+# The implementation is based on code provided by the original authors.
+#
+# Main function: get_Bspline()
+#
+# Inputs:
+# - x: A numeric vector of design points.
+# - Y: A numeric vector of observed responses corresponding to x.
+# - x_new: A numeric vector of evaluation points for prediction.
+# - Alpha: Significance level for credible bands (default is 0.05).
+# - CI: Logical flag indicating whether to include credible bands in the output (default is FALSE).
+#
+# Output (a list containing the following elements):
+# - N: Number of interior knots selected via cross-validation.
+# - rmse: A numeric vector with RMSEs for the estimated regression function and its first derivative.
+# - f_hat: Estimated regression function values at x_new.
+# - f_prime_hat: Estimated first derivative values at x_new.
+# - f_hat_lb_st: Lower bound of the simultaneous L-infinity credible band for the regression function.
+# - f_hat_ub_st: Upper bound of the simultaneous L-infinity credible band for the regression function.
+# - f_prime_hat_lb_st: Lower bound of the simultaneous L-infinity credible band for the first derivative.
+# - f_prime_hat_ub_st: Upper bound of the simultaneous L-infinity credible band for the first derivative.
+
 library(splines)
 
 #calculate sigma2hat for empirical Bayes
