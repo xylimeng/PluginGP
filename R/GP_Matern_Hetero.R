@@ -1,21 +1,56 @@
+# Implements the proposed plug-in Gaussian Process method with a Matérn kernel 
+# under the assumption of heterogeneous regression error.
+# This function is used to generate Figure 2(b) in the paper.
+
+
 library(Rsolnp)
 library(MASS)
 library(RandomFieldsUtils)
 
-# Matern kernel
+
+# Matern kernel function.
+# Computes the Matérn kernel matrix between x1 and x2.
+# Inputs:
+# - x1, x2: Numeric vectors of input locations.
+# - nu: Smoothness parameter for the Matérn kernel.
+# Output:
+# - A matrix of kernel evaluations.
 mat <- function(x1, x2, nu){
   matrix(matern(abs(outer(x2, x1, "-")), nu, derivative = 0), ncol = length(x1))}
 
+
+# First derivative of the Matern kernel with respect to the second argument.
+# Inputs:
+# - x1, x2: Numeric vectors of input locations.
+# - nu: Smoothness parameter.
+# Output:
+# - Matrix of first derivative kernel evaluations.
 mat_prime <- function(x1, x2, nu){
   XX <- outer(x2, x1, "-")
   out <- matrix(matern(abs(XX), nu, derivative = 1), ncol = length(x1)) * sign(XX)
   out}
 
+
+# Second derivative of the Matern kernel with respect to the second argument.
+# Inputs:
+# - x1, x2: Numeric vectors of input locations.
+# - nu: Smoothness parameter.
+# Output:
+# - Matrix of second derivative kernel evaluations.
 mat_2prime <- function(x1, x2, nu){
   XX <- outer(x2, x1, "-")
   out <- -matrix(matern(abs(XX), nu, derivative = 2), ncol = length(x1))
   out}
 
+
+# Estimate the regularization parameter (lambda) for the Gaussian Process
+# using empirical Bayes via marginal likelihood maximization.
+# Inputs:
+# - x: Design points.
+# - y: Observed responses.
+# - nu: Matérn smoothness parameter.
+# Output:
+# - Estimated lambda (scalar).
 get_lambda_matern <- function(x, y, nu){
   n <- length(x)
   
@@ -31,6 +66,14 @@ get_lambda_matern <- function(x, y, nu){
   powell <- solnp(pars = c(2e-3, 5e-3), fun = log_post_matern, LB = c(2e-3, 5e-3), UB = c(1, 1))
   powell$pars}
 
+
+# Compute leave-one-out cross-validation error for the GP model.
+# Inputs:
+# - x, y: Design points and responses.
+# - nu: Matérn smoothness parameter.
+# - lambda: Regularization parameter.
+# Output:
+# - Scalar value of LOO mean squared error.
 get_LOO_matern <- function(x, y, nu, lambda){
   mse <- rep(0, n)
   for(i in 1:n){
@@ -55,6 +98,32 @@ get_LOO_matern <- function(x, y, nu, lambda){
   return(mean(mse))
 }
 
+
+# Main function: Fits a plug-in Gaussian Process model with Matérn kernel under
+# the assumption of heterogeneous noise and returns posterior estimates.
+# 
+# Inputs:
+# - x, y: Design points and observed responses.
+# - x_new: New input locations where predictions are desired.
+# - nu: Matérn smoothness parameter.
+# - alpha: Significance level for credible bands (default = 0.05).
+# - LOO: Whether to return leave-one-out error (default = FALSE).
+# - CI: Whether to return pointwise and simultaneous credible bands (default = FALSE).
+# - RMSE: Whether to return RMSE compared to known truth f0_new and f0_new_prime (default = FALSE).
+#
+# Output (a list containing the following elements):
+# - loo_error: Leave-one-out cross-validation error.
+# - rmse: A numeric vector containing RMSEs for the estimated regression function and its first derivative.
+# - f_hat: Estimated values of the regression function at x_new.
+# - f_prime_hat: Estimated values of the first derivative at x_new.
+# - f_hat_lb_pw: Lower bounds of the pointwise credible bands for the regression function.
+# - f_hat_ub_pw: Upper bounds of the pointwise credible bands for the regression function.
+# - f_hat_lb_st: Lower bounds of the simultaneous L-infinity credible bands for the regression function.
+# - f_hat_ub_st: Upper bounds of the simultaneous L-infinity credible bands for the regression function.
+# - f_prime_lb_pw: Lower bounds of the pointwise credible bands for the first derivative.
+# - f_prime_ub_pw: Upper bounds of the pointwise credible bands for the first derivative.
+# - f_prime_hat_lb_st: Lower bounds of the simultaneous L-infinity credible bands for the first derivative.
+# - f_prime_hat_ub_st: Upper bounds of the simultaneous L-infinity credible bands for the first derivative.
 get_GPR_matern <- function(x, y, x_new, nu, alpha = 0.05, LOO = FALSE, CI = FALSE, RMSE = FALSE){
   n <- length(x)
   n_new <- length(x_new)

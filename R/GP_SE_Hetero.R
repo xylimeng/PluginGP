@@ -1,20 +1,51 @@
+# Implements the proposed plug-in Gaussian Process method with a squared exponential kernel
+# under the assumption of heterogeneous regression error.
+# This function is used to generate Figure 2(b) in the paper.
+
+
 library(Rsolnp)
 library(MASS)
 library(RandomFieldsUtils)
 
-# Squared exponential kernel
+
+# Squared exponential kernel function.
+# Computes the kernel matrix between x1 and x2 using the squared exponential kernel.
+# Inputs:
+# - x1, x2: Numeric vectors of input locations.
+# Output:
+# - A matrix of kernel evaluations.
 SE <- function(x1, x2){exp(-outer(x2, x1, "-")^2)}
 
+
+# First derivative of the squared exponential kernel.
+# Inputs:
+# - x1, x2: Numeric vectors of input locations.
+# Output:
+# - Matrix of first derivative kernel evaluations.
 SE_prime <- function(x1, x2){
   XX <- outer(x2, x1, "-")
   out <- -2 * XX * exp(-XX^2)
   out}
 
+
+# Second derivative of the squared exponential kernel.
+# Inputs:
+# - x1, x2: Numeric vectors of input locations.
+# Output:
+# - Matrix of second derivative kernel evaluations.
 SE_2prime <- function(x1, x2){
   XX <- outer(x2, x1, "-")
   out <- 2 * exp(-XX^2) - 4 * XX^2 * exp(-XX^2)
   out}
 
+
+# Estimates the regularization parameter (lambda) using empirical Bayes
+# by maximizing the marginal likelihood.
+# Inputs:
+# - x: Design points.
+# - y: Observed responses.
+# Output:
+# - Estimated lambda (scalar).
 get_lambda_SE <- function(x, y){
   n <- length(x)
   
@@ -30,6 +61,13 @@ get_lambda_SE <- function(x, y){
   powell <- solnp(pars = c(2e-3, 5e-3), fun = log_post_SE, LB = c(2e-3, 5e-3), UB = c(1, 1))
   powell$pars}
 
+
+# Computes the leave-one-out cross-validation error for the GP with SE kernel.
+# Inputs:
+# - x, y: Design points and observed responses.
+# - lambda: Regularization parameter.
+# Output:
+# - Scalar value of LOO mean squared error.
 get_LOO_SE <- function(x, y, lambda){
   mse <- rep(0, n)
   for(i in 1:n){
@@ -54,6 +92,31 @@ get_LOO_SE <- function(x, y, lambda){
   return(mean(mse))
 }
 
+
+# Main function: Fits a plug-in Gaussian Process model with squared exponential kernel under
+# the assumption of heterogeneous noise and returns posterior estimates.
+# 
+# Inputs:
+# - x, y: Design points and observed responses.
+# - x_new: New input locations where predictions are desired.
+# - alpha: Significance level for credible bands (default = 0.05).
+# - LOO: Whether to return leave-one-out error (default = FALSE).
+# - CI: Whether to return pointwise and simultaneous credible bands (default = FALSE).
+# - RMSE: Whether to return RMSE compared to known truth f0_new and f0_new_prime (default = FALSE).
+#
+# Output (a list containing the following elements):
+# - loo_error: Leave-one-out cross-validation error.
+# - rmse: A numeric vector containing RMSEs for the estimated regression function and its first derivative.
+# - f_hat: Estimated values of the regression function at x_new.
+# - f_prime_hat: Estimated values of the first derivative at x_new.
+# - f_hat_lb_pw: Lower bounds of the pointwise credible bands for the regression function.
+# - f_hat_ub_pw: Upper bounds of the pointwise credible bands for the regression function.
+# - f_hat_lb_st: Lower bounds of the simultaneous L-infinity credible bands for the regression function.
+# - f_hat_ub_st: Upper bounds of the simultaneous L-infinity credible bands for the regression function.
+# - f_prime_lb_pw: Lower bounds of the pointwise credible bands for the first derivative.
+# - f_prime_ub_pw: Upper bounds of the pointwise credible bands for the first derivative.
+# - f_prime_hat_lb_st: Lower bounds of the simultaneous L-infinity credible bands for the first derivative.
+# - f_prime_hat_ub_st: Upper bounds of the simultaneous L-infinity credible bands for the first derivative.
 get_GPR_SE <- function(x, y, x_new, alpha = 0.05, LOO = FALSE, CI = FALSE, RMSE = FALSE){
   n <- length(x)
   n_new <- length(x_new)

@@ -1,48 +1,51 @@
 # Implements the B-spline method proposed by Yoo and Ghosal (2016), 
 # which serves as a benchmark method in the associated paper.
 # The implementation is based on code provided by the original authors.
-#
-# Main function: get_Bspline()
-#
-# Inputs:
-# - x: A numeric vector of design points.
-# - Y: A numeric vector of observed responses corresponding to x.
-# - x_new: A numeric vector of evaluation points for prediction.
-# - Alpha: Significance level for credible bands (default is 0.05).
-# - CI: Logical flag indicating whether to include credible bands in the output (default is FALSE).
-#
-# Output (a list containing the following elements):
-# - N: Number of interior knots selected via cross-validation.
-# - rmse: A numeric vector with RMSEs for the estimated regression function and its first derivative.
-# - f_hat: Estimated regression function values at x_new.
-# - f_prime_hat: Estimated first derivative values at x_new.
-# - f_hat_lb_st: Lower bound of the simultaneous L-infinity credible band for the regression function.
-# - f_hat_ub_st: Upper bound of the simultaneous L-infinity credible band for the regression function.
-# - f_prime_hat_lb_st: Lower bound of the simultaneous L-infinity credible band for the first derivative.
-# - f_prime_hat_ub_st: Upper bound of the simultaneous L-infinity credible band for the first derivative.
+
 
 library(splines)
 
-#calculate sigma2hat for empirical Bayes
+
+# Computes the empirical Bayes estimate of the error variance (sigma^2).
+# Inputs:
+# - y: Response vector.
+# - cmiddle: Cholesky factor of the posterior precision matrix.
+# - B: B-spline basis matrix.
+# - eta: Prior mean vector.
+# Output:
+# - Estimated error variance (scalar).
 sigma2emp <- function(y, cmiddle, B, eta){
   ydiff <- y - B %*% eta
   sigma2 = (crossprod(ydiff) - crossprod(forwardsolve(cmiddle, crossprod(B, ydiff)))) / n
   return(sigma2)
 }
 
-#returns posterior mean and variance
+
+# Computes the posterior mean of the function (or its derivative).
+# Inputs:
+# - y: Observed responses.
+# - cmiddle: Cholesky factor of the posterior precision matrix.
+# - B: B-spline basis matrix.
+# - b: Evaluation basis (e.g., at x_new).
+# - Omegainv: Inverse prior covariance matrix.
+# - eta: Prior mean vector.
+# Output:
+# - Posterior mean (vector).
 pfmeanf <- function(y, cmiddle, B, b, Omegainv, eta){
   ans = forwardsolve(cmiddle, crossprod(B, y) + Omegainv %*% eta)
   pmean = crossprod(t(b), backsolve(t(cmiddle), ans))  #(3.4), (3.5), r = 0
   return(pmean)
 }
 
-pfvarf <- function(cmiddle, b){ 
-  pSigma = crossprod(forwardsolve(cmiddle, t(b)))  #(3.6), r = 0
-  return(pSigma)
-}
 
-#determine the best number of splines
+# Performs cross-validation to select the optimal number of interior knots.
+# Inputs:
+# - y, x: Response and design vectors.
+# - a: Current knot locations.
+# - Omegainv: Inverse prior covariance matrix.
+# - eta: Prior mean vector.
+# Output:
+# - Mean squared prediction error (scalar).
 optimal <- function(y, x, a, Omegainv, eta){
   mse <- rep(0, n)
   for(k in 1:n){
@@ -66,6 +69,13 @@ optimal <- function(y, x, a, Omegainv, eta){
 }
 
 
+# Computes the derivative of the B-spline basis matrix.
+# Inputs:
+# - x: Evaluation points.
+# - derivs: Order of derivative (typically 1).
+# - df, knots, degree, intercept, Boundary.knots: Parameters for B-spline basis.
+# Output:
+# - Derivative B-spline basis matrix.
 bsprime <- function(x, derivs, df = NULL, knots = NULL, degree, intercept = TRUE, Boundary.knots = range(x))
 {
   nx <- names(x)
@@ -88,6 +98,26 @@ bsprime <- function(x, derivs, df = NULL, knots = NULL, degree, intercept = TRUE
   basis
 }
 
+
+# Main function: Implements the Bayesian B-spline regression method of Yoo and Ghosal (2016).
+# Automatically selects the optimal number of interior knots via cross-validation.
+#
+# Inputs:
+# - x: A numeric vector of design points.
+# - y: A numeric vector of observed responses.
+# - x_new: A numeric vector of evaluation points for prediction.
+# - alpha: Significance level for simultaneous credible bands (default = 0.05).
+# - CI: Logical flag indicating whether to include credible bands in the output (default = FALSE).
+#
+# Output (a list containing the following elements):
+# - N: Number of interior knots selected via cross-validation.
+# - rmse: A numeric vector containing RMSEs for the estimated regression function and its first derivative.
+# - f_hat: Estimated values of the regression function at x_new.
+# - f_prime_hat: Estimated values of the first derivative at x_new.
+# - f_hat_lb_st: Lower bounds of the simultaneous L-infinity credible bands for the regression function.
+# - f_hat_ub_st: Upper bounds of the simultaneous L-infinity credible bands for the regression function.
+# - f_prime_hat_lb_st: Lower bounds of the simultaneous L-infinity credible bands for the first derivative.
+# - f_prime_hat_ub_st: Upper bounds of the simultaneous L-infinity credible bands for the first derivative.
 get_Bspline <- function(x, y, x_new, alpha = 0.05, CI = FALSE){
   n <- length(x)
   n_new <- length(x_new)
