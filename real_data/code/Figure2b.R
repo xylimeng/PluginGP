@@ -1,3 +1,6 @@
+# This R script generates Figure 2(b) in the paper.
+
+
 # remotes::install_github("cran/RandomFieldsUtils")
 source("GP_Matern_Hetero.R")
 source("GP_SE_Hetero.R")

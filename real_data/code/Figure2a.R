@@ -1,3 +1,6 @@
+# This R script generates Figure 2(a) in the paper.
+
+
 # remotes::install_github("cran/RandomFieldsUtils")
 source("GP_Matern.R")
 source("GP_SE.R")

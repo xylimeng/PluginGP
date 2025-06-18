@@ -1,3 +1,6 @@
+# This R script generates Figure 1 in the paper.
+
+
 # remotes::install_github("cran/RandomFieldsUtils")
 library(foreach)
 library(doSNOW)
