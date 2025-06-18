@@ -28,7 +28,7 @@ Inference on function derivatives using Plug-in Gaussian processes
   - `Figure2b.R`: Code for generating Figure 2(b).
 
 - #### data/
-  - `CSIRO_Recons_gmsl_yr_2015.txt`: Global mean sea level data. The data used in our analysis are directly downloaded from https://research.csiro.au/slrwavescoast/sea-level/measurements-and-data/sea-level-data, under the section “Update of Reconstructed GMSL from 1880 to 2013” within “Sea level and ocean heat content.” The dataset is already cleaned and formatted for use; no additional preprocessing is required.
+  - `CSIRO_Recons_gmsl_yr_2015.txt`: Global mean sea level data. The data is directly downloaded from https://research.csiro.au/slrwavescoast/sea-level/measurements-and-data/sea-level-data, under the section “Update of Reconstructed GMSL from 1880 to 2013” within “Sea level and ocean heat content.” The dataset is already cleaned and formatted for use; no additional preprocessing is required.
 
 
 - #### figure/
